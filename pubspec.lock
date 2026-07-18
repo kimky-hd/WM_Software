@@ -176,6 +176,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+<<<<<<< Updated upstream
   nested:
     dependency: transitive
     description:
@@ -184,6 +185,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+=======
+>>>>>>> Stashed changes
   path:
     dependency: transitive
     description:
@@ -349,6 +352,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
+<<<<<<< Updated upstream
   typed_data:
     dependency: transitive
     description:
@@ -365,6 +369,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.0"
+=======
+>>>>>>> Stashed changes
   vector_math:
     dependency: transitive
     description:
