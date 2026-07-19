@@ -35,6 +35,7 @@ class StockCheckNote {
   final String? approvedBy;
   final DocumentStatus status;
   final List<StockCheckDetail> details;
+  final String? rejectReason;
 
   const StockCheckNote({
     required this.id,
@@ -44,9 +45,10 @@ class StockCheckNote {
     this.approvedBy,
     required this.status,
     required this.details,
+    this.rejectReason,
   });
 
-  StockCheckNote copyWith({DocumentStatus? status, String? approvedBy}) => StockCheckNote(
+  StockCheckNote copyWith({DocumentStatus? status, String? approvedBy, String? rejectReason}) => StockCheckNote(
         id: id,
         code: code,
         checkDate: checkDate,
@@ -54,6 +56,7 @@ class StockCheckNote {
         approvedBy: approvedBy ?? this.approvedBy,
         status: status ?? this.status,
         details: details,
+        rejectReason: rejectReason ?? this.rejectReason,
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +67,7 @@ class StockCheckNote {
         'approvedBy': approvedBy,
         'status': status.name,
         'details': details.map((d) => d.toJson()).toList(),
+        'rejectReason': rejectReason,
       };
 
   factory StockCheckNote.fromJson(Map<String, dynamic> json) => StockCheckNote(
@@ -76,5 +80,6 @@ class StockCheckNote {
         details: (json['details'] as List)
             .map((d) => StockCheckDetail.fromJson(d as Map<String, dynamic>))
             .toList(),
+        rejectReason: json['rejectReason'] as String?,
       );
 }

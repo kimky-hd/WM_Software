@@ -17,12 +17,14 @@ enum UserRole {
 }
 
 /// Trạng thái chứng từ: Nháp -> Chờ duyệt -> Đã duyệt -> Hoàn thành, hoặc Từ chối.
+/// `cancelled`: Quản lý kho huỷ phiếu đã duyệt (có ghi log), theo ma trận phân quyền.
 enum DocumentStatus {
   draft,
   pendingApproval,
   approved,
   completed,
-  rejected;
+  rejected,
+  cancelled;
 
   String get label {
     switch (this) {
@@ -36,6 +38,8 @@ enum DocumentStatus {
         return 'Hoàn thành';
       case DocumentStatus.rejected:
         return 'Từ chối';
+      case DocumentStatus.cancelled:
+        return 'Đã huỷ';
     }
   }
 }

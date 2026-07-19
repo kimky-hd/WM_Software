@@ -12,6 +12,7 @@ class ReturnSupplierNote {
   final String createdBy;
   final String? approvedBy;
   final DocumentStatus status;
+  final String? rejectReason;
 
   const ReturnSupplierNote({
     required this.id,
@@ -24,9 +25,11 @@ class ReturnSupplierNote {
     required this.createdBy,
     this.approvedBy,
     required this.status,
+    this.rejectReason,
   });
 
-  ReturnSupplierNote copyWith({DocumentStatus? status, String? approvedBy}) => ReturnSupplierNote(
+  ReturnSupplierNote copyWith({DocumentStatus? status, String? approvedBy, String? rejectReason}) =>
+      ReturnSupplierNote(
         id: id,
         code: code,
         createdAt: createdAt,
@@ -37,6 +40,7 @@ class ReturnSupplierNote {
         createdBy: createdBy,
         approvedBy: approvedBy ?? this.approvedBy,
         status: status ?? this.status,
+        rejectReason: rejectReason ?? this.rejectReason,
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,6 +54,7 @@ class ReturnSupplierNote {
         'createdBy': createdBy,
         'approvedBy': approvedBy,
         'status': status.name,
+        'rejectReason': rejectReason,
       };
 
   factory ReturnSupplierNote.fromJson(Map<String, dynamic> json) => ReturnSupplierNote(
@@ -63,5 +68,6 @@ class ReturnSupplierNote {
         createdBy: json['createdBy'] as String,
         approvedBy: json['approvedBy'] as String?,
         status: DocumentStatus.values.byName(json['status'] as String),
+        rejectReason: json['rejectReason'] as String?,
       );
 }

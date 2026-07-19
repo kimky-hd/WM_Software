@@ -7,6 +7,7 @@ class Batch {
   final DateTime expiryDate;
   final double quantityIn;
   final double quantityRemaining;
+  final String? sourceNoteId;
 
   const Batch({
     required this.id,
@@ -16,6 +17,7 @@ class Batch {
     required this.expiryDate,
     required this.quantityIn,
     required this.quantityRemaining,
+    this.sourceNoteId,
   });
 
   Batch copyWith({double? quantityRemaining}) => Batch(
@@ -26,6 +28,7 @@ class Batch {
         expiryDate: expiryDate,
         quantityIn: quantityIn,
         quantityRemaining: quantityRemaining ?? this.quantityRemaining,
+        sourceNoteId: sourceNoteId,
       );
 
   bool get isExpired => expiryDate.isBefore(DateTime.now());
@@ -40,6 +43,7 @@ class Batch {
         'expiryDate': expiryDate.toIso8601String(),
         'quantityIn': quantityIn,
         'quantityRemaining': quantityRemaining,
+        'sourceNoteId': sourceNoteId,
       };
 
   factory Batch.fromJson(Map<String, dynamic> json) => Batch(
@@ -50,5 +54,6 @@ class Batch {
         expiryDate: DateTime.parse(json['expiryDate'] as String),
         quantityIn: (json['quantityIn'] as num).toDouble(),
         quantityRemaining: (json['quantityRemaining'] as num).toDouble(),
+        sourceNoteId: json['sourceNoteId'] as String?,
       );
 }

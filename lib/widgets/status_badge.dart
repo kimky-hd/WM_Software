@@ -19,6 +19,8 @@ class StatusBadge extends StatelessWidget {
         return Colors.green;
       case DocumentStatus.rejected:
         return Colors.red;
+      case DocumentStatus.cancelled:
+        return Colors.grey.shade700;
     }
   }
 

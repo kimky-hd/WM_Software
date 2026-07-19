@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'data/app_storage.dart';
 import 'models/enums.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/manager/manager_home_screen.dart';
 import 'screens/staff/staff_home_screen.dart';
 import 'state/auth_store.dart';
 import 'state/warehouse_store.dart';
@@ -65,8 +66,9 @@ class AuthGate extends StatelessWidget {
     switch (auth.currentUser!.role) {
       case UserRole.warehouseStaff:
         return const StaffHomeScreen();
-      case UserRole.admin:
       case UserRole.warehouseManager:
+        return const ManagerHomeScreen();
+      case UserRole.admin:
         return _RoleNotReadyScreen(role: auth.currentUser!.role);
     }
   }

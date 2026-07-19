@@ -7,10 +7,29 @@ import '../models/enums.dart';
 
 /// Dữ liệu mẫu để khởi tạo ứng dụng lần đầu (seed).
 class MockData {
+  /// 3 tài khoản demo (mỗi role 1 tài khoản) - đăng nhập bằng email + mật khẩu bên dưới.
   static final List<AppUser> users = [
-    const AppUser(id: 'u-admin', name: 'Trần Văn Admin', email: 'admin@wm.local', role: UserRole.admin),
-    const AppUser(id: 'u-manager', name: 'Nguyễn Thị Quản Lý', email: 'manager@wm.local', role: UserRole.warehouseManager),
-    const AppUser(id: 'u-staff', name: 'Lê Văn Nhân Viên', email: 'staff@wm.local', role: UserRole.warehouseStaff),
+    const AppUser(
+      id: 'u-admin',
+      name: 'Trần Văn Admin',
+      email: 'admin@wm.local',
+      password: 'admin123',
+      role: UserRole.admin,
+    ),
+    const AppUser(
+      id: 'u-manager',
+      name: 'Nguyễn Thị Quản Lý',
+      email: 'manager@wm.local',
+      password: 'manager123',
+      role: UserRole.warehouseManager,
+    ),
+    const AppUser(
+      id: 'u-staff',
+      name: 'Lê Văn Nhân Viên',
+      email: 'staff@wm.local',
+      password: 'staff123',
+      role: UserRole.warehouseStaff,
+    ),
   ];
 
   static final List<UnitOfMeasure> units = [

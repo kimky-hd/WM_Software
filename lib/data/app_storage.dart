@@ -58,4 +58,5 @@ class StorageKeys {
   static const adjustmentNotes = 'wm_adjustment_notes';
   static const returnSupplierNotes = 'wm_return_supplier_notes';
   static const damageExpiredNotes = 'wm_damage_expired_notes';
+  static const auditLogs = 'wm_audit_logs';
 }

@@ -12,6 +12,7 @@ class AdjustmentNote {
   final String proposedBy;
   final String? approvedBy;
   final DocumentStatus status;
+  final String? rejectReason;
 
   const AdjustmentNote({
     required this.id,
@@ -24,19 +25,27 @@ class AdjustmentNote {
     required this.proposedBy,
     this.approvedBy,
     required this.status,
+    this.rejectReason,
   });
 
-  AdjustmentNote copyWith({DocumentStatus? status, String? approvedBy}) => AdjustmentNote(
+  AdjustmentNote copyWith({
+    DocumentStatus? status,
+    String? approvedBy,
+    String? batchId,
+    String? rejectReason,
+  }) =>
+      AdjustmentNote(
         id: id,
         code: code,
         createdAt: createdAt,
         productId: productId,
-        batchId: batchId,
+        batchId: batchId ?? this.batchId,
         adjustQty: adjustQty,
         reason: reason,
         proposedBy: proposedBy,
         approvedBy: approvedBy ?? this.approvedBy,
         status: status ?? this.status,
+        rejectReason: rejectReason ?? this.rejectReason,
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,6 +59,7 @@ class AdjustmentNote {
         'proposedBy': proposedBy,
         'approvedBy': approvedBy,
         'status': status.name,
+        'rejectReason': rejectReason,
       };
 
   factory AdjustmentNote.fromJson(Map<String, dynamic> json) => AdjustmentNote(
@@ -63,5 +73,6 @@ class AdjustmentNote {
         proposedBy: json['proposedBy'] as String,
         approvedBy: json['approvedBy'] as String?,
         status: DocumentStatus.values.byName(json['status'] as String),
+        rejectReason: json['rejectReason'] as String?,
       );
 }
