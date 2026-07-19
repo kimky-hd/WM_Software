@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
+import 'supplier_management_screen.dart';
+import 'product_management_screen.dart';
+import 'user_management_screen.dart';
 
 class AdminLayoutScreen extends StatefulWidget {
   const AdminLayoutScreen({super.key});
@@ -12,12 +15,26 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
   int _selectedIndex = 0;
   String _appBarTitle = 'Tổng quan';
 
+  void _changeTab(int index) {
+    String title = 'Tổng quan';
+    switch (index) {
+      case 1: title = 'Quản lý Sản phẩm'; break;
+      case 2: title = 'Nhà cung cấp'; break;
+      case 3: title = 'Quản lý Tài khoản'; break;
+      case 4: title = 'Nhật ký (Audit Log)'; break;
+    }
+    setState(() {
+      _selectedIndex = index;
+      _appBarTitle = title;
+    });
+  }
+
   // Danh sách các màn hình được điều hướng
-  final List<Widget> _screens = [
-    const DashboardScreen(),
-    const Center(child: Text('Màn hình Sản phẩm')), // Sẽ code sau
-    const Center(child: Text('Màn hình Nhà cung cấp')), // Sẽ code sau
-    const Center(child: Text('Màn hình Tài khoản')), // Sẽ code sau
+  List<Widget> get _screens => [
+    DashboardScreen(onNavigate: _changeTab),
+    const ProductManagementScreen(),
+    const SupplierManagementScreen(),
+    const UserManagementScreen(),
     const Center(child: Text('Nhật ký (Audit Log)')), // Sẽ code sau
   ];
 
