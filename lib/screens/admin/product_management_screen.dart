@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/product_model.dart';
-import '../services/shared_prefs_service.dart';
+import '../../models/product_model.dart';
+import '../../services/shared_prefs_service.dart';
 
 class ProductManagementScreen extends StatefulWidget {
   const ProductManagementScreen({super.key});

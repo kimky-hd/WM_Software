@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/user_model.dart';
-import '../services/shared_prefs_service.dart';
+import '../../models/user_model.dart';
+import '../../services/shared_prefs_service.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});

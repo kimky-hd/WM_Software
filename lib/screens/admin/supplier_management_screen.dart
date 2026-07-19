@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/supplier_model.dart';
-import '../services/shared_prefs_service.dart';
+import '../../models/supplier_model.dart';
+import '../../services/shared_prefs_service.dart';
 
 class SupplierManagementScreen extends StatefulWidget {
   const SupplierManagementScreen({super.key});
