@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/product_model.dart';
-import '../models/supplier_model.dart';
-import '../models/user_model.dart';
-import '../services/shared_prefs_service.dart';
+import '../../models/product_model.dart';
+import '../../models/supplier_model.dart';
+import '../../models/user_model.dart';
+import '../../services/shared_prefs_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   final Function(int)? onNavigate;
