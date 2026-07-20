@@ -266,10 +266,12 @@ class _OutboundLineCardState extends State<_OutboundLineCard> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                FilledButton.tonalIcon(
-                  onPressed: line.productId == null ? null : _generateFefoSuggestion,
-                  icon: const Icon(Icons.auto_awesome, size: 18),
-                  label: const Text('Gợi ý FEFO'),
+                Flexible(
+                  child: FilledButton.tonalIcon(
+                    onPressed: line.productId == null ? null : _generateFefoSuggestion,
+                    icon: const Icon(Icons.auto_awesome, size: 18),
+                    label: const Text('Gợi ý FEFO', overflow: TextOverflow.ellipsis),
+                  ),
                 ),
               ],
             ),

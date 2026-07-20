@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefsService {
@@ -20,7 +21,7 @@ class SharedPrefsService {
       String jsonString = jsonEncode(mapList);
       return await _prefs!.setString(key, jsonString);
     } catch (e) {
-      print("Lỗi khi lưu dữ liệu với key '$key': $e");
+      debugPrint("Lỗi khi lưu dữ liệu với key '$key': $e");
       return false;
     }
   }
@@ -35,7 +36,7 @@ class SharedPrefsService {
       List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList.map((e) => fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
-      print("Lỗi khi đọc dữ liệu với key '$key': $e");
+      debugPrint("Lỗi khi đọc dữ liệu với key '$key': $e");
       return [];
     }
   }
