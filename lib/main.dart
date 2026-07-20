@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'data/app_storage.dart';
 import 'models/enums.dart';
+import 'screens/admin/admin_layout_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/manager/manager_home_screen.dart';
 import 'screens/staff/staff_home_screen.dart';
@@ -46,7 +47,6 @@ class WmApp extends StatelessWidget {
     );
   }
 }
-
 /// Điều hướng theo trạng thái đăng nhập & vai trò người dùng.
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -69,7 +69,7 @@ class AuthGate extends StatelessWidget {
       case UserRole.warehouseManager:
         return const ManagerHomeScreen();
       case UserRole.admin:
-        return _RoleNotReadyScreen(role: auth.currentUser!.role);
+        return const AdminLayoutScreen();
     }
   }
 }
