@@ -165,6 +165,8 @@ class _InboundLineCard extends StatefulWidget {
 
 class _InboundLineCardState extends State<_InboundLineCard> {
   final _dateFmt = DateFormat('dd/MM/yyyy');
+  final _mfgDateKey = GlobalKey<FormFieldState<DateTime>>();
+  final _expDateKey = GlobalKey<FormFieldState<DateTime>>();
 
   Future<void> _pickDate({required bool isManufactureDate}) async {
     final now = DateTime.now();
@@ -181,11 +183,16 @@ class _InboundLineCardState extends State<_InboundLineCard> {
     setState(() {
       if (isManufactureDate) {
         widget.line.manufactureDate = picked;
+        _mfgDateKey.currentState?.didChange(picked);
         final product = widget.products.where((p) => p.id == widget.line.productId).firstOrNull;
         widget.line.expiryDate ??=
             picked.add(Duration(days: product?.defaultExpiryDays ?? 180));
+        if (widget.line.expiryDate != null) {
+          _expDateKey.currentState?.didChange(widget.line.expiryDate);
+        }
       } else {
         widget.line.expiryDate = picked;
+        _expDateKey.currentState?.didChange(picked);
       }
     });
   }
@@ -227,25 +234,73 @@ class _InboundLineCardState extends State<_InboundLineCard> {
             const SizedBox(height: 8),
             TextFormField(
               controller: line.batchCodeController,
-              decoration: const InputDecoration(labelText: 'Mã lô'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Nhập mã lô' : null,
+              decoration: const InputDecoration(labelText: 'Mã lô', counterText: ''),
+              maxLength: 10,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return 'Nhập mã lô';
+                if (v.trim().length > 10) return 'Mã lô tối đa 10 ký tự';
+                return null;
+              },
             ),
             const SizedBox(height: 8),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pickDate(isManufactureDate: true),
-                    icon: const Icon(Icons.event_outlined, size: 18),
-                    label: Text(line.manufactureDate == null ? 'Ngày SX' : _dateFmt.format(line.manufactureDate!)),
+                  child: FormField<DateTime>(
+                    key: _mfgDateKey,
+                    initialValue: line.manufactureDate,
+                    validator: (v) => v == null ? 'Chọn ngày SX' : null,
+                    builder: (field) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () => _pickDate(isManufactureDate: true),
+                          icon: const Icon(Icons.event_outlined, size: 18),
+                          label: Text(line.manufactureDate == null ? 'Ngày SX' : _dateFmt.format(line.manufactureDate!)),
+                        ),
+                        if (field.hasError)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12, top: 4),
+                            child: Text(
+                              field.errorText!,
+                              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pickDate(isManufactureDate: false),
-                    icon: const Icon(Icons.event_busy_outlined, size: 18),
-                    label: Text(line.expiryDate == null ? 'HSD' : _dateFmt.format(line.expiryDate!)),
+                  child: FormField<DateTime>(
+                    key: _expDateKey,
+                    initialValue: line.expiryDate,
+                    validator: (v) {
+                      if (v == null) return 'Chọn HSD';
+                      if (line.manufactureDate != null && !v.isAfter(line.manufactureDate!)) {
+                        return 'HSD phải sau ngày SX';
+                      }
+                      return null;
+                    },
+                    builder: (field) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () => _pickDate(isManufactureDate: false),
+                          icon: const Icon(Icons.event_busy_outlined, size: 18),
+                          label: Text(line.expiryDate == null ? 'HSD' : _dateFmt.format(line.expiryDate!)),
+                        ),
+                        if (field.hasError)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12, top: 4),
+                            child: Text(
+                              field.errorText!,
+                              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],

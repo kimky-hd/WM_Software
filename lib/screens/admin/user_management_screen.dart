@@ -147,7 +147,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: selectedRole,
+                        initialValue: selectedRole,
                         decoration: InputDecoration(
                           labelText: 'Vai trò (Role)',
                           prefixIcon: const Icon(Icons.manage_accounts),
@@ -171,7 +171,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             Text('Trạng thái hoạt động', style: TextStyle(color: Colors.grey.shade700)),
                             Switch(
                               value: isActive,
-                              activeColor: Colors.green,
+                              activeThumbColor: Colors.green,
                               onChanged: (val) {
                                 setDialogState(() => isActive = val);
                               },
@@ -310,7 +310,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               )
@@ -319,7 +319,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
-              backgroundColor: isActive ? _getRoleColor(user.role).withOpacity(0.1) : Colors.grey.withOpacity(0.2),
+              backgroundColor: isActive ? _getRoleColor(user.role).withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
               child: Icon(Icons.person, color: isActive ? _getRoleColor(user.role) : Colors.grey),
             ),
             title: Row(
@@ -335,7 +335,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   Container(
                     margin: const EdgeInsets.only(left: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                     child: const Text('Đã Khóa', style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
                   ),
               ],
@@ -355,9 +355,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getRoleColor(user.role).withOpacity(0.1),
+                    color: _getRoleColor(user.role).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: _getRoleColor(user.role).withOpacity(0.5)),
+                    border: Border.all(color: _getRoleColor(user.role).withValues(alpha: 0.5)),
                   ),
                   child: Text(
                     _getRoleName(user.role), 
@@ -371,7 +371,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               children: [
                 Switch(
                   value: isActive,
-                  activeColor: Colors.green,
+                  activeThumbColor: Colors.green,
                   onChanged: (val) => _toggleUserStatus(user, val),
                 ),
                 IconButton(

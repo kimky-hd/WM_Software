@@ -85,7 +85,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: selectedCategory,
+                        initialValue: selectedCategory,
                         decoration: InputDecoration(
                           labelText: 'Danh mục',
                           prefixIcon: const Icon(Icons.category),
@@ -101,7 +101,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: selectedUnit,
+                              initialValue: selectedUnit,
                               decoration: InputDecoration(
                                 labelText: 'Đơn vị tính',
                                 prefixIcon: const Icon(Icons.scale),
@@ -264,7 +264,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               )
@@ -273,7 +273,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
-              backgroundColor: primaryColor.withOpacity(0.1),
+              backgroundColor: primaryColor.withValues(alpha: 0.1),
               child: Icon(Icons.inventory, color: primaryColor),
             ),
             title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
