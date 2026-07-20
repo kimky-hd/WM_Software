@@ -31,7 +31,7 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
 
   // Danh sách các màn hình được điều hướng
   List<Widget> get _screens => [
-    DashboardScreen(onNavigate: _changeTab),
+    DashboardScreen(key: UniqueKey(), onNavigate: _changeTab), // Thêm UniqueKey để tự reload
     const ProductManagementScreen(),
     const SupplierManagementScreen(),
     const UserManagementScreen(),
@@ -46,6 +46,17 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
     Navigator.pop(context); // Đóng Drawer sau khi chọn
   }
 
+  Widget _buildDrawerItem(IconData icon, String drawerTitle, String appBarTitle, int index) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(drawerTitle),
+      selected: _selectedIndex == index,
+      selectedTileColor: Colors.amber.withOpacity(0.2), // Highlight màu nền
+      selectedColor: Colors.amber[900], // Highlight màu chữ/icon
+      onTap: () => _onItemTapped(index, appBarTitle),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +66,9 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tính năng thông báo đang phát triển')));
+            },
           ),
         ],
       ),
@@ -80,42 +93,16 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
                 ],
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.dashboard),
-              title: const Text('Tổng quan'),
-              selected: _selectedIndex == 0,
-              onTap: () => _onItemTapped(0, 'Tổng quan'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.inventory_2),
-              title: const Text('Sản phẩm'),
-              selected: _selectedIndex == 1,
-              onTap: () => _onItemTapped(1, 'Quản lý Sản phẩm'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.local_shipping),
-              title: const Text('Nhà cung cấp'),
-              selected: _selectedIndex == 2,
-              onTap: () => _onItemTapped(2, 'Nhà cung cấp'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.manage_accounts),
-              title: const Text('Tài khoản User'),
-              selected: _selectedIndex == 3,
-              onTap: () => _onItemTapped(3, 'Quản lý Tài khoản'),
-            ),
+            _buildDrawerItem(Icons.dashboard, 'Tổng quan', 'Tổng quan', 0),
+            _buildDrawerItem(Icons.inventory_2, 'Sản phẩm', 'Quản lý Sản phẩm', 1),
+            _buildDrawerItem(Icons.local_shipping, 'Nhà cung cấp', 'Nhà cung cấp', 2),
+            _buildDrawerItem(Icons.manage_accounts, 'Tài khoản User', 'Quản lý Tài khoản', 3),
             const Divider(),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('Nhật ký hệ thống'),
-              selected: _selectedIndex == 4,
-              onTap: () => _onItemTapped(4, 'Nhật ký (Audit Log)'),
-            ),
+            _buildDrawerItem(Icons.history, 'Nhật ký hệ thống', 'Nhật ký (Audit Log)', 4),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Đăng xuất', style: TextStyle(color: Colors.red)),
               onTap: () {
-                // Logic đăng xuất sẽ thêm sau
                 Navigator.pop(context);
               },
             ),

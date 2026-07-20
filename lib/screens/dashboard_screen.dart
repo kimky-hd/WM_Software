@@ -78,10 +78,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               physics: const NeverScrollableScrollPhysics(),
               childAspectRatio: 1.5,
               children: [
-                _buildStatCard('Sản phẩm', _totalProducts.toString(), Icons.inventory_2, Colors.blue),
-                _buildStatCard('Đối tác', _totalSuppliers.toString(), Icons.local_shipping, Colors.green),
-                _buildStatCard('Tài khoản', _totalUsers.toString(), Icons.manage_accounts, Colors.purple),
-                _buildStatCard('Cảnh báo', _lowStockAlerts.toString(), Icons.warning_amber, Colors.orange),
+                _buildStatCard('Sản phẩm', _totalProducts.toString(), Icons.inventory_2, Colors.blue, onTap: () => widget.onNavigate?.call(1)),
+                _buildStatCard('Đối tác', _totalSuppliers.toString(), Icons.local_shipping, Colors.green, onTap: () => widget.onNavigate?.call(2)),
+                _buildStatCard('Tài khoản', _totalUsers.toString(), Icons.manage_accounts, Colors.purple, onTap: () => widget.onNavigate?.call(3)),
+                _buildStatCard('Cảnh báo', _lowStockAlerts.toString(), Icons.warning_amber, Colors.orange, onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tính năng cảnh báo đang phát triển')));
+                }),
               ],
             ),
             
@@ -120,7 +122,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tính năng xem toàn bộ nhật ký đang phát triển')));
+                  },
                   child: const Text('Xem tất cả', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
                 ),
               ],
@@ -135,9 +139,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
+  Widget _buildStatCard(String title, String value, IconData icon, Color color, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -169,6 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w500),
           ),
         ],
+      ),
       ),
     );
   }
