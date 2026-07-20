@@ -99,11 +99,6 @@ class _ReturnSupplierFormState extends State<_ReturnSupplierForm> {
   Future<void> _submit(WarehouseStore store) async {
     if (!_formKey.currentState!.validate()) return;
     final qty = double.parse(_qtyController.text.trim());
-    final batch = store.batchById(_batchId!);
-    if (batch != null && qty > batch.quantityRemaining) {
-      showAppSnackBar(context, 'Số lượng vượt quá tồn của lô (${batch.quantityRemaining.toStringAsFixed(0)}kg)', isError: true);
-      return;
-    }
 
     final user = context.read<AuthStore>().currentUser!;
     setState(() => _submitting = true);
@@ -123,6 +118,7 @@ class _ReturnSupplierFormState extends State<_ReturnSupplierForm> {
   Widget build(BuildContext context) {
     final store = context.watch<WarehouseStore>();
     final List<Batch> batches = _productId == null ? [] : store.availableBatchesForProduct(_productId!);
+    final Batch? selectedBatch = _batchId == null ? null : store.batchById(_batchId!);
 
     return Padding(
       padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(context).viewInsets.bottom + 20),
@@ -168,6 +164,9 @@ class _ReturnSupplierFormState extends State<_ReturnSupplierForm> {
                 validator: (v) {
                   final n = double.tryParse(v ?? '');
                   if (n == null || n <= 0) return 'Số lượng không hợp lệ';
+                  if (selectedBatch != null && n > selectedBatch.quantityRemaining) {
+                    return 'Vượt tồn lô (còn ${selectedBatch.quantityRemaining.toStringAsFixed(0)}kg)';
+                  }
                   return null;
                 },
               ),
