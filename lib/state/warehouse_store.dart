@@ -148,7 +148,7 @@ class WarehouseStore extends ChangeNotifier {
   /// Quản lý kho chỉ được "đề xuất sửa" danh mục sản phẩm (Admin mới có toàn quyền
   /// sửa) - đề xuất được ghi vào Audit Log để Admin xem xét sau.
   Future<void> proposeProductEdit(Product product, {required AppUser actor, required String suggestion}) async {
-    await _addLog(
+    await addLog(
       actorId: actor.id,
       actorName: actor.name,
       action: 'Đề xuất sửa sản phẩm',
@@ -160,7 +160,7 @@ class WarehouseStore extends ChangeNotifier {
 
   // ---------- Nhật ký hoạt động (Audit Log) ----------
 
-  Future<void> _addLog({
+  Future<void> addLog({
     required String actorId,
     required String actorName,
     required String action,
@@ -347,7 +347,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.inboundNotes, inboundNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Duyệt phiếu nhập kho',
@@ -366,7 +366,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.inboundNotes, inboundNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Từ chối phiếu nhập kho',
@@ -391,7 +391,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.inboundNotes, inboundNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Huỷ phiếu nhập kho',
@@ -420,7 +420,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.outboundNotes, outboundNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Duyệt phiếu xuất kho',
@@ -439,7 +439,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.outboundNotes, outboundNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Từ chối phiếu xuất kho',
@@ -464,7 +464,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.outboundNotes, outboundNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Huỷ phiếu xuất kho',
@@ -484,7 +484,7 @@ class WarehouseStore extends ChangeNotifier {
         .map((n) => n.id == note.id ? n.copyWith(status: DocumentStatus.approved, approvedBy: approver.id) : n)
         .toList();
     await _persist(StorageKeys.stockCheckNotes, stockCheckNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Duyệt phiếu kiểm kê',
@@ -503,7 +503,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.stockCheckNotes, stockCheckNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Từ chối phiếu kiểm kê',
@@ -523,7 +523,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.stockCheckNotes, stockCheckNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Huỷ phiếu kiểm kê',
@@ -563,7 +563,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.adjustmentNotes, adjustmentNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Duyệt phiếu điều chỉnh tồn',
@@ -582,7 +582,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.adjustmentNotes, adjustmentNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Từ chối phiếu điều chỉnh tồn',
@@ -607,7 +607,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.adjustmentNotes, adjustmentNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Huỷ phiếu điều chỉnh tồn',
@@ -632,7 +632,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.returnSupplierNotes, returnSupplierNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Duyệt phiếu trả hàng NCC',
@@ -652,7 +652,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.returnSupplierNotes, returnSupplierNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Từ chối phiếu trả hàng NCC',
@@ -676,7 +676,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.returnSupplierNotes, returnSupplierNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Huỷ phiếu trả hàng NCC',
@@ -701,7 +701,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.damageExpiredNotes, damageExpiredNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Duyệt phiếu hàng hỏng/hết hạn',
@@ -721,7 +721,7 @@ class WarehouseStore extends ChangeNotifier {
             : n)
         .toList();
     await _persist(StorageKeys.damageExpiredNotes, damageExpiredNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Từ chối phiếu hàng hỏng/hết hạn',
@@ -745,7 +745,7 @@ class WarehouseStore extends ChangeNotifier {
 
     await _persist(StorageKeys.batches, batches.map((e) => e.toJson()).toList());
     await _persist(StorageKeys.damageExpiredNotes, damageExpiredNotes.map((e) => e.toJson()).toList());
-    await _addLog(
+    await addLog(
       actorId: approver.id,
       actorName: approver.name,
       action: 'Huỷ phiếu hàng hỏng/hết hạn',
@@ -757,6 +757,17 @@ class WarehouseStore extends ChangeNotifier {
   }
 
   // ---------- Persistence ----------
+
+  /// Public methods cho Admin screens gọi khi CRUD sản phẩm/nhà cung cấp
+  Future<void> persistProducts() async {
+    await _persist(StorageKeys.products, products.map((e) => e.toJson()).toList());
+    notifyListeners();
+  }
+
+  Future<void> persistSuppliers() async {
+    await _persist(StorageKeys.suppliers, suppliers.map((e) => e.toJson()).toList());
+    notifyListeners();
+  }
 
   Future<void> _persist(String key, List<Map<String, dynamic>> data) => _storage.saveList(key, data);
 
