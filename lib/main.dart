@@ -46,7 +46,6 @@ class WmApp extends StatelessWidget {
     );
   }
 }
-
 /// Điều hướng theo trạng thái đăng nhập & vai trò người dùng.
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});

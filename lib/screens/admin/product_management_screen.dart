@@ -13,6 +13,7 @@ class ProductManagementScreen extends StatefulWidget {
 class _ProductManagementScreenState extends State<ProductManagementScreen> {
   List<ProductModel> _products = [];
   bool _isLoading = true;
+  String _searchQuery = '';
 
   final List<String> _categories = ['Đồ khô', 'Ngũ cốc', 'Gia vị', 'Khác'];
   final List<String> _units = ['Kg', 'Bao', 'Tấn', 'Thùng', 'Gói'];
@@ -225,9 +226,16 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
       backgroundColor: Colors.transparent,
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
-          : _products.isEmpty
-              ? _buildEmptyState()
-              : _buildListView(primaryColor),
+          : Column(
+              children: [
+                _buildSearchBar(primaryColor),
+                Expanded(
+                  child: _products.isEmpty
+                      ? _buildEmptyState()
+                      : _buildListView(primaryColor),
+                ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
@@ -251,12 +259,45 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
     );
   }
 
+  Widget _buildSearchBar(Color primaryColor) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Tìm kiếm sản phẩm...',
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value.toLowerCase();
+          });
+        },
+      ),
+    );
+  }
+
   Widget _buildListView(Color primaryColor) {
+    final filteredList = _products.where((p) {
+      return p.name.toLowerCase().contains(_searchQuery) ||
+             p.productCode.toLowerCase().contains(_searchQuery);
+    }).toList();
+
+    if (filteredList.isEmpty) {
+      return const Center(child: Text('Không tìm thấy kết quả'));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
-      itemCount: _products.length,
+      itemCount: filteredList.length,
       itemBuilder: (context, index) {
-        final product = _products[index];
+        final product = filteredList[index];
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(

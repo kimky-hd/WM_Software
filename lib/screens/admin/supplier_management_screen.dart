@@ -10,9 +10,9 @@ class SupplierManagementScreen extends StatefulWidget {
 }
 
 class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
-  final Color primaryColor = const Color(0xFF512DA8);
   List<SupplierModel> _suppliers = [];
   bool _isLoading = true;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -45,6 +45,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
     showDialog(
       context: context,
       builder: (context) {
+        final primaryColor = Theme.of(context).colorScheme.primary;
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -169,13 +170,21 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
-          : _suppliers.isEmpty
-              ? _buildEmptyState()
-              : _buildListView(),
+          : Column(
+              children: [
+                _buildSearchBar(),
+                Expanded(
+                  child: _suppliers.isEmpty
+                      ? _buildEmptyState()
+                      : _buildListView(),
+                ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
@@ -199,12 +208,47 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
     );
   }
 
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Tìm kiếm đối tác...',
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value.toLowerCase();
+          });
+        },
+      ),
+    );
+  }
+
   Widget _buildListView() {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final filteredList = _suppliers.where((s) {
+      return s.name.toLowerCase().contains(_searchQuery) ||
+             s.contact.toLowerCase().contains(_searchQuery) ||
+             s.taxCode.toLowerCase().contains(_searchQuery);
+    }).toList();
+
+    if (filteredList.isEmpty) {
+      return const Center(child: Text('Không tìm thấy kết quả'));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
-      itemCount: _suppliers.length,
+      itemCount: filteredList.length,
       itemBuilder: (context, index) {
-        final supplier = _suppliers[index];
+        final supplier = filteredList[index];
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(

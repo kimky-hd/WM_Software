@@ -12,6 +12,7 @@ class UserManagementScreen extends StatefulWidget {
 class _UserManagementScreenState extends State<UserManagementScreen> {
   List<UserModel> _users = [];
   bool _isLoading = true;
+  String _searchQuery = '';
 
   final List<String> _roles = ['MANAGER', 'STAFF'];
   
@@ -283,7 +284,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       backgroundColor: Colors.transparent,
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
-          : _buildListView(primaryColor),
+          : Column(
+              children: [
+                _buildSearchBar(),
+                Expanded(
+                  child: _users.isEmpty
+                      ? const Center(child: Text('Chưa có tài khoản nào'))
+                      : _buildListView(primaryColor),
+                ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
@@ -294,12 +304,45 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Tìm kiếm nhân sự...',
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value.toLowerCase();
+          });
+        },
+      ),
+    );
+  }
+
   Widget _buildListView(Color primaryColor) {
+    final filteredList = _users.where((u) {
+      return u.fullName.toLowerCase().contains(_searchQuery) ||
+             u.email.toLowerCase().contains(_searchQuery);
+    }).toList();
+
+    if (filteredList.isEmpty) {
+      return const Center(child: Text('Không tìm thấy kết quả'));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
-      itemCount: _users.length,
+      itemCount: filteredList.length,
       itemBuilder: (context, index) {
-        final user = _users[index];
+        final user = filteredList[index];
         final isActive = user.status == 'ACTIVE';
         final isAdmin = user.role == 'ADMIN';
 
