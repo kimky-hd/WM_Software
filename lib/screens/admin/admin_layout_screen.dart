@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../state/auth_store.dart';
 import 'dashboard_screen.dart';
 import 'supplier_management_screen.dart';
 import 'product_management_screen.dart';
 import 'user_management_screen.dart';
+import 'audit_log_screen.dart';
 
 class AdminLayoutScreen extends StatefulWidget {
   const AdminLayoutScreen({super.key});
@@ -31,11 +34,11 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
 
   // Danh sách các màn hình được điều hướng
   List<Widget> get _screens => [
-    DashboardScreen(key: UniqueKey(), onNavigate: _changeTab), // Thêm UniqueKey để tự reload
+    DashboardScreen(onNavigate: _changeTab),
     const ProductManagementScreen(),
     const SupplierManagementScreen(),
     const UserManagementScreen(),
-    const Center(child: Text('Nhật ký (Audit Log)')), // Sẽ code sau
+    const AuditLogScreen(),
   ];
 
   void _onItemTapped(int index, String title) {
@@ -103,7 +106,28 @@ class _AdminLayoutScreenState extends State<AdminLayoutScreen> {
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Đăng xuất', style: TextStyle(color: Colors.red)),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // Đóng drawer
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: Colors.white,
+                    title: const Text('Xác nhận đăng xuất'),
+                    content: const Text('Bạn có chắc chắn muốn đăng xuất không?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Không', style: TextStyle(color: Colors.grey)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          context.read<AuthStore>().logout();
+                        },
+                        child: const Text('Có', style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],

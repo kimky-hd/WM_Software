@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../models/product_model.dart';
-import '../../services/shared_prefs_service.dart';
+import 'package:provider/provider.dart';
+import '../../models/product.dart';
+import '../../state/auth_store.dart';
+import '../../state/warehouse_store.dart';
 
 class ProductManagementScreen extends StatefulWidget {
   const ProductManagementScreen({super.key});
@@ -11,41 +13,21 @@ class ProductManagementScreen extends StatefulWidget {
 }
 
 class _ProductManagementScreenState extends State<ProductManagementScreen> {
-  List<ProductModel> _products = [];
-  bool _isLoading = true;
   String _searchQuery = '';
 
-  final List<String> _categories = ['Đồ khô', 'Ngũ cốc', 'Gia vị', 'Khác'];
-  final List<String> _units = ['Kg', 'Bao', 'Tấn', 'Thùng', 'Gói'];
+  final List<String> _categories = ['Đồ khô', 'Ngũ cốc', 'Gia vị', 'Hạt', 'Khác'];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
-  }
-
-  Future<void> _loadProducts() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 300));
-    final data = SharedPrefsService.instance.getDataList('products', ProductModel.fromJson);
-    setState(() {
-      _products = data;
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _saveProducts() async {
-    await SharedPrefsService.instance.saveDataList('products', _products, (p) => p.toJson());
-  }
-
-  void _showProductDialog([ProductModel? product]) {
+  void _showProductDialog([Product? product]) {
     final isEditing = product != null;
     final nameController = TextEditingController(text: product?.name);
-    final codeController = TextEditingController(text: product?.productCode);
-    final minStockController = TextEditingController(text: product?.minStockLevel.toString());
-    
+    final codeController = TextEditingController(text: product?.code);
+    final minStockController = TextEditingController(text: product?.minStock.toStringAsFixed(0));
+    final expiryDaysController = TextEditingController(text: product?.defaultExpiryDays.toString());
+
     String selectedCategory = product?.category ?? _categories.first;
-    String selectedUnit = product?.unit ?? _units.first;
+    final store = context.read<WarehouseStore>();
+    // Lấy tên unit mặc định
+    String selectedUnitId = product?.baseUnitId ?? (store.units.isNotEmpty ? store.units.first.id : '');
 
     final formKey = GlobalKey<FormState>();
 
@@ -86,7 +68,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: selectedCategory,
+                        value: selectedCategory,
                         decoration: InputDecoration(
                           labelText: 'Danh mục',
                           prefixIcon: const Icon(Icons.category),
@@ -98,28 +80,39 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: selectedUnitId.isNotEmpty ? selectedUnitId : null,
+                        decoration: InputDecoration(
+                          labelText: 'Đơn vị tính',
+                          prefixIcon: const Icon(Icons.scale),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        items: store.units.map((u) => DropdownMenuItem(value: u.id, child: Text(u.name))).toList(),
+                        onChanged: (val) {
+                          if (val != null) setDialogState(() => selectedUnitId = val);
+                        },
+                      ),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              initialValue: selectedUnit,
-                              decoration: InputDecoration(
-                                labelText: 'Đơn vị tính',
-                                prefixIcon: const Icon(Icons.scale),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              items: _units.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                              onChanged: (val) {
-                                if (val != null) setDialogState(() => selectedUnit = val);
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 16),
                           Expanded(
                             child: TextFormField(
                               controller: minStockController,
                               decoration: InputDecoration(
                                 labelText: 'Tồn tối thiểu',
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              validator: (val) => val == null || val.isEmpty ? 'Nhập số' : null,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: TextFormField(
+                              controller: expiryDaysController,
+                              decoration: InputDecoration(
+                                labelText: 'HSD (ngày)',
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                               ),
                               keyboardType: TextInputType.number,
@@ -144,41 +137,48 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (formKey.currentState!.validate()) {
-                      setState(() {
-                        if (isEditing) {
-                          final index = _products.indexWhere((p) => p.id == product.id);
-                          if (index != -1) {
-                            _products[index] = ProductModel(
-                              id: product.id,
-                              productCode: codeController.text,
-                              name: nameController.text,
-                              category: selectedCategory,
-                              unit: selectedUnit,
-                              minStockLevel: int.tryParse(minStockController.text) ?? 0,
-                            );
-                          }
-                        } else {
-                          _products.add(ProductModel(
-                            id: DateTime.now().millisecondsSinceEpoch.toString(),
-                            productCode: codeController.text,
-                            name: nameController.text,
-                            category: selectedCategory,
-                            unit: selectedUnit,
-                            minStockLevel: int.tryParse(minStockController.text) ?? 0,
-                          ));
-                        }
-                      });
-                      _saveProducts();
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!'),
-                          backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      final newProduct = Product(
+                        id: product?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+                        code: codeController.text,
+                        name: nameController.text,
+                        category: selectedCategory,
+                        baseUnitId: selectedUnitId,
+                        minStock: double.tryParse(minStockController.text) ?? 0,
+                        defaultExpiryDays: int.tryParse(expiryDaysController.text) ?? 365,
                       );
+
+                      if (isEditing) {
+                        store.products = store.products.map((p) => p.id == product.id ? newProduct : p).toList();
+                        store.addLog(
+                          actorId: context.read<AuthStore>().currentUser!.id,
+                          actorName: context.read<AuthStore>().currentUser!.name,
+                          action: 'Cập nhật sản phẩm',
+                          targetCode: newProduct.code,
+                        );
+                      } else {
+                        store.products = [...store.products, newProduct];
+                        store.addLog(
+                          actorId: context.read<AuthStore>().currentUser!.id,
+                          actorName: context.read<AuthStore>().currentUser!.name,
+                          action: 'Thêm sản phẩm mới',
+                          targetCode: newProduct.code,
+                        );
+                      }
+                      // Lưu vào SharedPreferences thông qua AppStorage
+                      await store.persistProducts();
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!'),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     }
                   },
                   child: const Text('Lưu'),
@@ -201,15 +201,23 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
           TextButton(
-            onPressed: () {
-              setState(() {
-                _products.removeWhere((p) => p.id == id);
-              });
-              _saveProducts();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã xóa sản phẩm'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating,),
+            onPressed: () async {
+              final store = context.read<WarehouseStore>();
+              final p = store.products.firstWhere((p) => p.id == id);
+              store.products = store.products.where((p) => p.id != id).toList();
+              store.addLog(
+                actorId: context.read<AuthStore>().currentUser!.id,
+                actorName: context.read<AuthStore>().currentUser!.name,
+                action: 'Xóa sản phẩm',
+                targetCode: p.code,
               );
+              await store.persistProducts();
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Đã xóa sản phẩm'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+                );
+              }
             },
             child: const Text('Xóa', style: TextStyle(color: Colors.red)),
           ),
@@ -221,18 +229,20 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
-    
+    final store = context.watch<WarehouseStore>();
+    final products = store.products;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: _isLoading
+      body: store.isLoading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
           : Column(
               children: [
                 _buildSearchBar(primaryColor),
                 Expanded(
-                  child: _products.isEmpty
+                  child: products.isEmpty
                       ? _buildEmptyState()
-                      : _buildListView(primaryColor),
+                      : _buildListView(primaryColor, products),
                 ),
               ],
             ),
@@ -283,21 +293,24 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
     );
   }
 
-  Widget _buildListView(Color primaryColor) {
-    final filteredList = _products.where((p) {
+  Widget _buildListView(Color primaryColor, List<Product> products) {
+    final filteredList = products.where((p) {
       return p.name.toLowerCase().contains(_searchQuery) ||
-             p.productCode.toLowerCase().contains(_searchQuery);
+             p.code.toLowerCase().contains(_searchQuery);
     }).toList();
 
     if (filteredList.isEmpty) {
       return const Center(child: Text('Không tìm thấy kết quả'));
     }
 
+    final store = context.read<WarehouseStore>();
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
       itemCount: filteredList.length,
       itemBuilder: (context, index) {
         final product = filteredList[index];
+        final unitName = store.unitById(product.baseUnitId)?.name ?? product.baseUnitId;
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
@@ -305,7 +318,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: Colors.black.withOpacity(0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               )
@@ -314,7 +327,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
-              backgroundColor: primaryColor.withValues(alpha: 0.1),
+              backgroundColor: primaryColor.withOpacity(0.1),
               child: Icon(Icons.inventory, color: primaryColor),
             ),
             title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -333,7 +346,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                       child: Text(product.category, style: const TextStyle(fontSize: 12, color: Colors.black87)),
                     ),
                     const SizedBox(width: 8),
-                    Text('Mã: ${product.productCode}', style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                    Text('Mã: ${product.code}', style: const TextStyle(color: Colors.black54, fontSize: 13)),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -341,11 +354,11 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
                   children: [
                     const Icon(Icons.scale, size: 14, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text('Đơn vị: ${product.unit}', style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                    Text('Đơn vị: $unitName', style: const TextStyle(color: Colors.black54, fontSize: 13)),
                     const SizedBox(width: 16),
                     const Icon(Icons.warning_amber, size: 14, color: Colors.orange),
                     const SizedBox(width: 4),
-                    Text('Min: ${product.minStockLevel}', style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                    Text('Min: ${product.minStock.toStringAsFixed(0)}', style: const TextStyle(color: Colors.black54, fontSize: 13)),
                   ],
                 ),
               ],
