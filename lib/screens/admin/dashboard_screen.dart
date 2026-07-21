@@ -106,9 +106,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _buildQuickAction(Icons.category, 'Mặt hàng', Colors.blue, onTap: () {
                   widget.onNavigate?.call(1); // Link sang tab số 1 (Sản phẩm)
                 }),
-                _buildQuickAction(Icons.qr_code_scanner, 'Quét mã', Colors.indigo, onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chức năng quét mã vạch đang phát triển')));
-                }),
               ],
             ),
             

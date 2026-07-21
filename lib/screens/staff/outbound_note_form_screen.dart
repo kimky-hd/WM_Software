@@ -265,14 +265,6 @@ class _OutboundLineCardState extends State<_OutboundLineCard> {
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: FilledButton.tonalIcon(
-                    onPressed: line.productId == null ? null : _generateFefoSuggestion,
-                    icon: const Icon(Icons.auto_awesome, size: 18),
-                    label: const Text('Gợi ý FEFO', overflow: TextOverflow.ellipsis),
-                  ),
-                ),
               ],
             ),
             if (line.allocations.isNotEmpty) ...[

@@ -7,7 +7,6 @@ import 'damage_expired_screen.dart';
 import 'inbound_note_list_screen.dart';
 import 'inventory_view_screen.dart';
 import 'outbound_note_list_screen.dart';
-import 'qr_scan_screen.dart';
 import 'return_supplier_screen.dart';
 import 'stock_check_list_screen.dart';
 
@@ -60,12 +59,6 @@ class StaffHomeScreen extends StatelessWidget {
         subtitle: 'Xuất khỏi tồn kho',
         icon: Icons.report_gmailerrorred_outlined,
         builder: (_) => const DamageExpiredScreen(),
-      ),
-      _StaffAction(
-        title: 'Quét mã QR/Barcode',
-        subtitle: 'Tra cứu nhanh sản phẩm / lô hàng',
-        icon: Icons.qr_code_scanner_rounded,
-        builder: (_) => const QrScanScreen(),
       ),
     ];
 
