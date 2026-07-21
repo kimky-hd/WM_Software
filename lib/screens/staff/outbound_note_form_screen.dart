@@ -263,15 +263,14 @@ class _OutboundLineCardState extends State<_OutboundLineCard> {
                     controller: line.requestedQtyController,
                     decoration: const InputDecoration(labelText: 'Số lượng cần xuất (kg)'),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onEditingComplete: _generateFefoSuggestion,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Flexible(
-                  child: FilledButton.tonalIcon(
-                    onPressed: line.productId == null ? null : _generateFefoSuggestion,
-                    icon: const Icon(Icons.auto_awesome, size: 18),
-                    label: const Text('Gợi ý FEFO', overflow: TextOverflow.ellipsis),
-                  ),
+                FilledButton.icon(
+                  onPressed: _generateFefoSuggestion,
+                  icon: const Icon(Icons.auto_fix_high, size: 16),
+                  label: const Text('Gợi ý FEFO'),
                 ),
               ],
             ),
