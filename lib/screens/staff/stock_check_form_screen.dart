@@ -14,6 +14,7 @@ class StockCheckFormScreen extends StatefulWidget {
 }
 
 class _StockCheckFormScreenState extends State<StockCheckFormScreen> {
+  final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _controllers = {};
   bool _submitting = false;
 
@@ -33,6 +34,7 @@ class _StockCheckFormScreenState extends State<StockCheckFormScreen> {
   }
 
   Future<void> _submit(WarehouseStore store) async {
+    if (!_formKey.currentState!.validate()) return;
     final details = <StockCheckDetail>[];
     for (final product in store.products) {
       final systemQty = store.totalStockForProduct(product.id);
@@ -55,7 +57,9 @@ class _StockCheckFormScreenState extends State<StockCheckFormScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Kiểm kê thực tế')),
-      body: ListView(
+      body: Form(
+        key: _formKey,
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
           Text(
@@ -89,6 +93,12 @@ class _StockCheckFormScreenState extends State<StockCheckFormScreen> {
                         textAlign: TextAlign.right,
                         decoration: const InputDecoration(labelText: 'Thực tế', isDense: true),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        validator: (v) {
+                          final n = double.tryParse(v?.trim() ?? '');
+                          if (n == null) return 'Số không hợp lệ';
+                          if (n < 0) return 'Không được âm';
+                          return null;
+                        },
                       ),
                     ),
                   ],
@@ -97,6 +107,7 @@ class _StockCheckFormScreenState extends State<StockCheckFormScreen> {
             );
           }),
         ],
+        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
