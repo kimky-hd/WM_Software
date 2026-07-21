@@ -50,6 +50,16 @@ class _OutboundNoteFormScreenState extends State<OutboundNoteFormScreen> {
         final qty = double.tryParse(line.requestedQtyController.text.trim()) ?? 0;
         if (qty > 0) {
           final suggestion = store.suggestFefoAllocation(line.productId!, qty);
+          final allocated = suggestion.fold<double>(0, (sum, s) => sum + s.quantity);
+          if (allocated < qty) {
+            final product = store.productById(line.productId!);
+            showAppSnackBar(
+              context,
+              '"${product?.name ?? ''}" chỉ còn ${allocated.toStringAsFixed(0)}kg trong kho, không đủ để xuất ${qty.toStringAsFixed(0)}kg',
+              isError: true,
+            );
+            return;
+          }
           line.allocations = suggestion
               .map((s) => _Allocation()
                 ..batchId = s.batch.id
