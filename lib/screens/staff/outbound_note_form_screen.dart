@@ -45,6 +45,18 @@ class _OutboundNoteFormScreenState extends State<OutboundNoteFormScreen> {
 
     for (final line in _lines) {
       if (line.productId == null) continue;
+      // Tự động phân bổ FEFO nếu người dùng chưa trigger gợi ý
+      if (line.allocations.isEmpty) {
+        final qty = double.tryParse(line.requestedQtyController.text.trim()) ?? 0;
+        if (qty > 0) {
+          final suggestion = store.suggestFefoAllocation(line.productId!, qty);
+          line.allocations = suggestion
+              .map((s) => _Allocation()
+                ..batchId = s.batch.id
+                ..quantityController.text = s.quantity.toStringAsFixed(0))
+              .toList();
+        }
+      }
       for (final alloc in line.allocations) {
         final qty = double.tryParse(alloc.quantityController.text.trim()) ?? 0;
         if (qty <= 0 || alloc.batchId == null) continue;
@@ -246,33 +258,25 @@ class _OutboundLineCardState extends State<_OutboundLineCard> {
                   .map((p) => DropdownMenuItem(
                       value: p.id, child: Text('${p.code} - ${p.name} (tồn: ${store.totalStockForProduct(p.id).toStringAsFixed(0)}kg)')))
                   .toList(),
-              onChanged: (v) => setState(() {
-                line.productId = v;
-                for (final a in line.allocations) {
-                  a.dispose();
-                }
-                line.allocations = [];
-              }),
+              onChanged: (v) {
+                setState(() {
+                  line.productId = v;
+                  for (final a in line.allocations) {
+                    a.dispose();
+                  }
+                  line.allocations = [];
+                });
+                final qty = double.tryParse(line.requestedQtyController.text.trim()) ?? 0;
+                if (v != null && qty > 0) _generateFefoSuggestion();
+              },
               validator: (v) => v == null ? 'Chọn sản phẩm' : null,
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: line.requestedQtyController,
-                    decoration: const InputDecoration(labelText: 'Số lượng cần xuất (kg)'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    onEditingComplete: _generateFefoSuggestion,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton.icon(
-                  onPressed: _generateFefoSuggestion,
-                  icon: const Icon(Icons.auto_fix_high, size: 16),
-                  label: const Text('Gợi ý FEFO'),
-                ),
-              ],
+            TextFormField(
+              controller: line.requestedQtyController,
+              decoration: const InputDecoration(labelText: 'Số lượng cần xuất (kg)'),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              onEditingComplete: _generateFefoSuggestion,
             ),
             if (line.allocations.isNotEmpty) ...[
               const SizedBox(height: 8),
